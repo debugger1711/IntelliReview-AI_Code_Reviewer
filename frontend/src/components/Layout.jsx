@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import TopNav from './TopNav';
 import { useAuth } from '../context/AuthContext';
+import { cn } from '../lib/utils';
 
 const Layout = () => {
   const { user } = useAuth();
   const location = useLocation();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const getPageInfo = () => {
     switch (location.pathname) {
@@ -27,8 +29,13 @@ const Layout = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <div className="flex flex-1 flex-col lg:pl-[260px] transition-all">
+      <Sidebar isCollapsed={isSidebarCollapsed} toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
+      <div 
+        className={cn(
+          "flex flex-1 flex-col transition-all duration-300",
+          isSidebarCollapsed ? "lg:pl-[80px]" : "lg:pl-[260px]"
+        )}
+      >
         <TopNav title={title} subtitle={subtitle} />
         <main className="flex-1 p-8 overflow-y-auto">
           <div className="mx-auto max-w-7xl">
