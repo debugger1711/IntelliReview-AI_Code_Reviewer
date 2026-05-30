@@ -1,86 +1,64 @@
-import { useState } from 'react';
-import { HiOutlineExclamationCircle } from 'react-icons/hi';
-
-const tabs = [
-  { id: 'bugs', label: 'Bugs', colorClass: 'text-red-500', borderClass: 'border-red-500', badgeClass: 'bg-red-500/10 text-red-500 border-red-500/20' },
-  { id: 'suggestions', label: 'Suggestions', colorClass: 'text-yellow-500', borderClass: 'border-yellow-500', badgeClass: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' },
-  { id: 'readability', label: 'Readability', colorClass: 'text-blue-500', borderClass: 'border-blue-500', badgeClass: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-  { id: 'optimization', label: 'Optimization', colorClass: 'text-green-500', borderClass: 'border-green-500', badgeClass: 'bg-green-500/10 text-green-500 border-green-500/20' },
-  { id: 'complexity', label: 'Complexity', colorClass: 'text-purple-500', borderClass: 'border-purple-500', badgeClass: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
-];
+import React from 'react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/Tabs';
+import { Badge } from './ui/Badge';
+import { AlertCircle, Lightbulb, Type, Zap, Activity } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const ReviewTabs = ({ review }) => {
-  const [activeTab, setActiveTab] = useState('bugs');
-  const getSeverityBadge = (severity) => {
-    switch(severity) {
-      case 'High': return 'severity-high';
-      case 'Medium': return 'severity-medium';
-      case 'Low': return 'severity-low';
-      default: return 'severity-medium';
-    }
-  };
+  if (!review) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center opacity-50">
+        <Activity className="mb-4 h-12 w-12 text-text-secondary" />
+        <p className="text-sm text-text-secondary max-w-[200px]">
+          Submit some code above to see your AI review results here.
+        </p>
+      </div>
+    );
+  }
 
-  const renderContent = () => {
-    const activeData = tabs.find(t => t.id === activeTab);
-    
-    if (!review) {
+  const IssueList = ({ items, icon: Icon, colorClass }) => {
+    if (!items || items.length === 0) {
       return (
-        <div className="py-12 text-center text-gray-500 text-sm">
-          Submit some code above to see your AI review results.
-        </div>
-      );
-    }
-
-    const items = review[activeTab] || [];
-
-    if (activeTab === 'complexity') {
-      return (
-        <div className="mt-4 flex flex-col gap-4">
-          <div className="issue-card flex flex-col items-start gap-2">
-            <h4 className="text-sm font-bold text-white">Time Complexity</h4>
-            <div className="text-sm font-mono text-gray-400 bg-black/20 p-3 rounded-lg border border-[#1f2937] w-full break-words leading-relaxed">
-              {review.timeComplexity || 'N/A'}
-            </div>
-          </div>
-          <div className="issue-card flex flex-col items-start gap-2">
-            <h4 className="text-sm font-bold text-white">Space Complexity</h4>
-            <div className="text-sm font-mono text-gray-400 bg-black/20 p-3 rounded-lg border border-[#1f2937] w-full break-words leading-relaxed">
-              {review.spaceComplexity || 'N/A'}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (items.length === 0) {
-      return (
-        <div className="py-12 text-center text-gray-500 text-sm">
-          No issues found in this category.
+        <div className="py-8 text-center text-sm text-text-secondary">
+          No issues found in this category. Great job!
         </div>
       );
     }
 
     return (
-      <div className="mt-4 flex flex-col">
+      <div className="space-y-4">
         {items.map((item, i) => {
-          // If real data, it's just a string, so we mock a title and severity
-          const title = typeof item === 'string' ? "Issue Detected" : item.title;
+          const title = typeof item === 'string' ? "Issue Detected" : (item.title || "Observation");
           const desc = typeof item === 'string' ? item : item.desc;
-          const severity = typeof item === 'string' ? "Medium" : item.severity;
+          const severity = typeof item === 'string' ? "Medium" : (item.severity || "Medium");
+
+          const getSeverityVariant = (sev) => {
+            if (sev === 'High') return 'error';
+            if (sev === 'Medium') return 'warning';
+            return 'success';
+          };
 
           return (
-            <div key={i} className="issue-card flex items-start gap-4">
-              <div className={`mt-1 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-[#1f2937]`}>
-                <HiOutlineExclamationCircle className={activeData.colorClass} />
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="flex gap-4 rounded-lg border border-border bg-surface p-4"
+            >
+              <div className={`mt-0.5 flex shrink-0 items-start ${colorClass}`}>
+                <Icon className="h-5 w-5" />
               </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-bold text-white mb-1">{title}</h4>
-                <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center justify-between gap-4">
+                  <h4 className="text-sm font-semibold text-text-primary">{title}</h4>
+                  <Badge variant={getSeverityVariant(severity)} className="shrink-0">{severity}</Badge>
+                </div>
+                <p className="text-sm text-text-secondary leading-relaxed">{desc}</p>
+                
+                {/* Simulated code snippet accordion could go here for real SaaS feel */}
               </div>
-              <div className={`badge-severity ${getSeverityBadge(severity)}`}>
-                {severity}
-              </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -88,34 +66,60 @@ const ReviewTabs = ({ review }) => {
   };
 
   return (
-    <div className="flat-card p-6 h-full flex flex-col">
-      <h2 className="text-lg font-bold text-white mb-6">AI Review Results</h2>
-
-      {/* Tabs */}
-      <div className="flex gap-2 overflow-x-auto border-b border-[#1f2937]">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-3 text-sm font-medium transition-all whitespace-nowrap border-b-2 ${
-                isActive 
-                  ? `${tab.colorClass} ${tab.borderClass}` 
-                  : 'text-gray-500 border-transparent hover:text-gray-300'
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+    <Tabs defaultValue="bugs" className="w-full">
+      <div className="overflow-x-auto pb-2 custom-scrollbar">
+        <TabsList>
+          <TabsTrigger value="bugs" className="gap-2">
+            <AlertCircle className="h-4 w-4 text-error" /> Bugs
+            {review.bugs?.length > 0 && <span className="ml-1 rounded-full bg-error/10 px-1.5 py-0.5 text-[10px] font-bold text-error">{review.bugs.length}</span>}
+          </TabsTrigger>
+          <TabsTrigger value="suggestions" className="gap-2">
+            <Lightbulb className="h-4 w-4 text-warning" /> Suggestions
+            {review.suggestions?.length > 0 && <span className="ml-1 rounded-full bg-warning/10 px-1.5 py-0.5 text-[10px] font-bold text-warning">{review.suggestions.length}</span>}
+          </TabsTrigger>
+          <TabsTrigger value="readability" className="gap-2">
+            <Type className="h-4 w-4 text-primary" /> Readability
+          </TabsTrigger>
+          <TabsTrigger value="optimization" className="gap-2">
+            <Zap className="h-4 w-4 text-success" /> Optimization
+          </TabsTrigger>
+          <TabsTrigger value="complexity" className="gap-2">
+            <Activity className="h-4 w-4 text-text-secondary" /> Complexity
+          </TabsTrigger>
+        </TabsList>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-        {renderContent()}
+      <div className="mt-6">
+        <TabsContent value="bugs">
+          <IssueList items={review.bugs} icon={AlertCircle} colorClass="text-error" />
+        </TabsContent>
+        <TabsContent value="suggestions">
+          <IssueList items={review.suggestions} icon={Lightbulb} colorClass="text-warning" />
+        </TabsContent>
+        <TabsContent value="readability">
+          <IssueList items={review.readability} icon={Type} colorClass="text-primary" />
+        </TabsContent>
+        <TabsContent value="optimization">
+          <IssueList items={review.optimization} icon={Zap} colorClass="text-success" />
+        </TabsContent>
+        <TabsContent value="complexity">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-lg border border-border bg-surface p-4">
+              <h4 className="text-sm font-semibold text-text-primary mb-2">Time Complexity</h4>
+              <div className="rounded border border-border bg-background p-3 font-mono text-sm text-text-secondary">
+                {review.timeComplexity || 'O(N)'}
+              </div>
+            </div>
+            <div className="rounded-lg border border-border bg-surface p-4">
+              <h4 className="text-sm font-semibold text-text-primary mb-2">Space Complexity</h4>
+              <div className="rounded border border-border bg-background p-3 font-mono text-sm text-text-secondary">
+                {review.spaceComplexity || 'O(1)'}
+              </div>
+            </div>
+          </div>
+        </TabsContent>
       </div>
-    </div>
+    </Tabs>
   );
 };
 

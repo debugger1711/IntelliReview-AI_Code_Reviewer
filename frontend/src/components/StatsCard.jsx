@@ -1,60 +1,40 @@
-const StatsCard = ({ icon: Icon, label, value, color = 'purple', delay = 0 }) => {
-  const colorMap = {
-    purple: {
-      iconBg: 'bg-purple-500/10',
-      iconColor: 'text-purple-400',
-      border: 'hover:border-purple-500/20',
-      glow: 'hover:shadow-[0_0_30px_rgba(124,58,237,0.1)]',
-    },
-    blue: {
-      iconBg: 'bg-blue-500/10',
-      iconColor: 'text-blue-400',
-      border: 'hover:border-blue-500/20',
-      glow: 'hover:shadow-[0_0_30px_rgba(59,130,246,0.1)]',
-    },
-    green: {
-      iconBg: 'bg-emerald-500/10',
-      iconColor: 'text-emerald-400',
-      border: 'hover:border-emerald-500/20',
-      glow: 'hover:shadow-[0_0_30px_rgba(16,185,129,0.1)]',
-    },
-    red: {
-      iconBg: 'bg-red-500/10',
-      iconColor: 'text-red-400',
-      border: 'hover:border-red-500/20',
-      glow: 'hover:shadow-[0_0_30px_rgba(239,68,68,0.1)]',
-    },
-    amber: {
-      iconBg: 'bg-amber-500/10',
-      iconColor: 'text-amber-400',
-      border: 'hover:border-amber-500/20',
-      glow: 'hover:shadow-[0_0_30px_rgba(245,158,11,0.1)]',
-    },
-    cyan: {
-      iconBg: 'bg-cyan-500/10',
-      iconColor: 'text-cyan-400',
-      border: 'hover:border-cyan-500/20',
-      glow: 'hover:shadow-[0_0_30px_rgba(6,182,212,0.1)]',
-    },
-  };
+import React from 'react';
+import { Card, CardContent } from './ui/Card';
+import { motion } from 'framer-motion';
 
-  const c = colorMap[color] || colorMap.purple;
-
+const StatsCard = ({ icon: Icon, label, value, trend, trendLabel, delay = 0 }) => {
+  const isPositive = trend > 0;
+  
   return (
-    <div
-      className={`glass-card p-5 animate-fade-in-up ${c.border} ${c.glow} transition-all duration-300 cursor-default`}
-      style={{ animationDelay: `${delay}ms`, opacity: 0 }}
-    >
-      <div className="flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-xl ${c.iconBg} flex items-center justify-center`}>
-          <Icon className={`text-2xl ${c.iconColor}`} />
+    <Card animate className="hover:shadow-md transition-shadow" style={{ transitionDelay: `${delay}ms` }}>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-1">
+            <span className="text-sm font-medium text-text-secondary">
+              {label}
+            </span>
+            <span className="text-2xl font-bold text-text-primary">
+              {value}
+            </span>
+          </div>
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Icon className="h-6 w-6" />
+          </div>
         </div>
-        <div>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">{label}</p>
-          <p className="text-2xl font-bold text-white mt-0.5">{value}</p>
-        </div>
-      </div>
-    </div>
+        {trend !== undefined && (
+          <div className="mt-4 flex items-center space-x-2 text-sm">
+            <span
+              className={`font-medium ${
+                isPositive ? 'text-success' : 'text-error'
+              }`}
+            >
+              {isPositive ? '+' : ''}{trend}%
+            </span>
+            <span className="text-text-secondary">{trendLabel}</span>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

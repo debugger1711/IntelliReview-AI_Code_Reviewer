@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { SiOpenai } from 'react-icons/si';
-import { HiOutlineMail, HiOutlineLockClosed, HiOutlineArrowRight } from 'react-icons/hi';
+import { Mail, Lock, ArrowRight, Code2, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
+import { motion } from 'framer-motion';
 
 const Login = () => {
   const { login } = useAuth();
@@ -30,79 +33,118 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ background: '#04060e' }}>
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px]"></div>
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px]"></div>
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
-        <div className="text-center mb-8 animate-fade-in flex flex-col items-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/25 mb-4">
-            <SiOpenai className="text-white text-2xl" />
+    <div className="flex min-h-screen bg-background">
+      {/* Left Side: Branding & Features (Hidden on mobile) */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-surface border-r border-border p-12 relative overflow-hidden">
+        {/* Subtle Background Pattern */}
+        <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#7c3aed_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Code2 className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Welcome back</h1>
-          <p className="text-slate-400 mt-1.5 text-sm">Sign in to IntelliReview</p>
+          <span className="text-2xl font-bold tracking-tight text-text-primary">IntelliReview</span>
         </div>
 
-        {/* Form Card */}
-        <div className="flat-card p-8 animate-fade-in">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
-              <div className="relative">
-                <HiOutlineMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg" />
-                <input
-                  id="login-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="input-field pl-11"
-                  autoComplete="email"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
-              <div className="relative">
-                <HiOutlineLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg" />
-                <input
-                  id="login-password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="input-field pl-11"
-                  autoComplete="current-password"
-                />
-              </div>
-            </div>
-
-            <button
-              id="login-submit"
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <div className="loader !w-5 !h-5 !border-2"></div>
-              ) : (
-                <>
-                  Sign In <HiOutlineArrowRight />
-                </>
-              )}
-            </button>
-          </form>
-
-          <p className="text-center mt-6 text-sm text-slate-400">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
-              Sign up
-            </Link>
+        <div className="relative z-10 max-w-lg mt-auto mb-auto">
+          <h1 className="text-4xl font-bold tracking-tight text-text-primary mb-6">
+            Elevate your code quality with AI.
+          </h1>
+          <p className="text-lg text-text-secondary mb-10 leading-relaxed">
+            Catch bugs, improve readability, and optimize your codebase instantly with our advanced AI reviewer tailored for modern engineering teams.
           </p>
+
+          <div className="space-y-4">
+            {['Automated PR reviews in seconds', 'Deep context understanding', 'Actionable inline suggestions'].map((feature, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 + 0.3 }}
+                className="flex items-center gap-3"
+              >
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+                <span className="text-text-primary font-medium">{feature}</span>
+              </motion.div>
+            ))}
+          </div>
         </div>
+
+        <div className="relative z-10 text-sm text-text-secondary">
+          © {new Date().getFullYear()} IntelliReview Inc. All rights reserved.
+        </div>
+      </div>
+
+      {/* Right Side: Login Form */}
+      <div className="flex flex-1 flex-col justify-center items-center p-8 sm:p-12">
+        {/* Mobile Logo */}
+        <div className="flex lg:hidden items-center gap-3 mb-10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Code2 className="h-6 w-6" />
+          </div>
+          <span className="text-2xl font-bold tracking-tight text-text-primary">IntelliReview</span>
+        </div>
+
+        <Card animate className="w-full max-w-[420px] shadow-lg border-border/50">
+          <CardHeader className="text-center pb-8">
+            <CardTitle className="text-2xl mb-2">Welcome back</CardTitle>
+            <CardDescription>Enter your credentials to access your account</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-text-primary" htmlFor="email">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="pl-10"
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-text-primary" htmlFor="password">Password</label>
+                  <a href="#" className="text-xs font-medium text-primary hover:text-primary-hover">Forgot password?</a>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="pl-10"
+                    autoComplete="current-password"
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                isLoading={loading}
+                className="w-full mt-2 gap-2"
+                size="lg"
+              >
+                Sign in <ArrowRight className="h-4 w-4" />
+              </Button>
+            </form>
+
+            <div className="mt-8 text-center text-sm text-text-secondary">
+              Don't have an account?{' '}
+              <Link to="/signup" className="font-medium text-primary hover:text-primary-hover transition-colors">
+                Sign up
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

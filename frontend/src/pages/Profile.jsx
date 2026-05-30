@@ -1,7 +1,10 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { reviewAPI } from '../api/axios';
-import { HiOutlineUser, HiOutlineMail, HiOutlineCalendar, HiOutlineCollection } from 'react-icons/hi';
+import { User, Mail, Calendar, FileText, Activity, ShieldCheck } from 'lucide-react';
+import { Avatar } from '../components/ui/Avatar';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
+import { motion } from 'framer-motion';
 
 const Profile = () => {
   const { user } = useAuth();
@@ -23,47 +26,102 @@ const Profile = () => {
     ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     : 'N/A';
 
-  const stats = [
-    { icon: HiOutlineUser, label: 'Username', value: user?.name || 'N/A', color: 'purple' },
-    { icon: HiOutlineMail, label: 'Email', value: user?.email || 'N/A', color: 'blue' },
-    { icon: HiOutlineCalendar, label: 'Joined', value: joinedDate, color: 'cyan' },
-    { icon: HiOutlineCollection, label: 'Total Reviews', value: loading ? '...' : reviewCount, color: 'green' },
-  ];
-
-  const colorMap = {
-    purple: { iconBg: 'bg-purple-500/10', iconColor: 'text-purple-400' },
-    blue: { iconBg: 'bg-blue-500/10', iconColor: 'text-blue-400' },
-    cyan: { iconBg: 'bg-cyan-500/10', iconColor: 'text-cyan-400' },
-    green: { iconBg: 'bg-emerald-500/10', iconColor: 'text-emerald-400' },
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    const parts = name.split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
   };
 
   return (
-    <div className="space-y-8 max-w-2xl mx-auto w-full pt-4">
-      <div className="glass-card p-8 flex flex-col items-center justify-center text-center animate-fade-in-up" style={{ opacity: 0 }}>
-        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/20 text-4xl font-bold text-white">
-          {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-        </div>
-        <h2 className="text-2xl font-bold text-white mt-4">{user?.name || 'User'}</h2>
-        <p className="text-slate-400 text-sm mt-1">{user?.email || ''}</p>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {stats.map((s, i) => {
-          const c = colorMap[s.color];
-          return (
-            <div key={s.label} className="glass-card p-5 animate-fade-in-up" style={{ animationDelay: `${(i+1)*80}ms`, opacity: 0 }}>
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl ${c.iconBg} flex items-center justify-center`}>
-                  <s.icon className={`text-2xl ${c.iconColor}`} />
+    <div className="space-y-8 max-w-4xl mx-auto animate-fade-in pb-8">
+      
+      {/* Hero Card */}
+      <Card animate>
+        <CardContent className="p-8 sm:p-12">
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <Avatar 
+              fallback={getInitials(user?.name)} 
+              className="h-24 w-24 text-2xl font-bold bg-primary text-primary-foreground border-4 border-background shadow-xl"
+            />
+            <div className="text-center sm:text-left space-y-2">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <h1 className="text-3xl font-bold tracking-tight text-text-primary">{user?.name || 'Developer'}</h1>
+                <ShieldCheck className="h-5 w-5 text-success" title="Verified Account" />
+              </div>
+              <p className="text-text-secondary">{user?.email}</p>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 mt-2 pt-2">
+                <div className="flex items-center gap-1.5 text-sm text-text-secondary">
+                  <Activity className="h-4 w-4" />
+                  <span>Pro Plan Active</span>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">{s.label}</p>
-                  <p className="text-white font-semibold mt-0.5 truncate">{s.value}</p>
+                <div className="flex items-center gap-1.5 text-sm text-text-secondary">
+                  <Calendar className="h-4 w-4" />
+                  <span>Joined {joinedDate}</span>
                 </div>
               </div>
             </div>
-          );
-        })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Info Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <Card animate style={{ transitionDelay: '100ms' }}>
+          <CardHeader>
+            <CardTitle className="text-lg">Personal Information</CardTitle>
+            <CardDescription>Your basic account details</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <User className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-text-secondary uppercase">Full Name</p>
+                <p className="font-medium text-text-primary">{user?.name || 'N/A'}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-warning/10 text-warning">
+                <Mail className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-text-secondary uppercase">Email Address</p>
+                <p className="font-medium text-text-primary">{user?.email || 'N/A'}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card animate style={{ transitionDelay: '200ms' }}>
+          <CardHeader>
+            <CardTitle className="text-lg">Activity Statistics</CardTitle>
+            <CardDescription>Your usage metrics</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-success/10 text-success">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-text-secondary uppercase">Code Reviews</p>
+                <p className="font-medium text-text-primary">{loading ? '...' : reviewCount} total analyses</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <Calendar className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-text-secondary uppercase">Member Since</p>
+                <p className="font-medium text-text-primary">{joinedDate}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
       </div>
     </div>
   );
