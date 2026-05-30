@@ -1,6 +1,8 @@
-import React, { forwardRef, useState } from 'react';
+import React, { createContext, useContext, forwardRef, useState } from 'react';
 import { cn } from '../../lib/utils';
 import { motion } from 'framer-motion';
+
+const TabsContext = createContext();
 
 const Tabs = ({ defaultValue, value, onValueChange, className, children }) => {
   const [activeTab, setActiveTab] = useState(value || defaultValue);
@@ -16,29 +18,16 @@ const Tabs = ({ defaultValue, value, onValueChange, className, children }) => {
 
   const currentTab = value !== undefined ? value : activeTab;
 
-  // Clone children to pass active state
-  const childrenWithProps = React.Children.map(children, child => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, { currentTab, onTabChange: handleTabChange });
-    }
-    return child;
-  });
-
   return (
-    <div className={cn("flex flex-col", className)}>
-      {childrenWithProps}
-    </div>
+    <TabsContext.Provider value={{ currentTab, onTabChange: handleTabChange }}>
+      <div className={cn("flex flex-col", className)}>
+        {children}
+      </div>
+    </TabsContext.Provider>
   );
 };
 
-const TabsList = forwardRef(({ className, currentTab, onTabChange, children, ...props }, ref) => {
-  const childrenWithProps = React.Children.map(children, child => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, { currentTab, onTabChange });
-    }
-    return child;
-  });
-
+const TabsList = forwardRef(({ className, children, ...props }, ref) => {
   return (
     <div
       ref={ref}
@@ -48,13 +37,14 @@ const TabsList = forwardRef(({ className, currentTab, onTabChange, children, ...
       )}
       {...props}
     >
-      {childrenWithProps}
+      {children}
     </div>
   );
 });
 TabsList.displayName = "TabsList";
 
-const TabsTrigger = forwardRef(({ className, value, currentTab, onTabChange, children, ...props }, ref) => {
+const TabsTrigger = forwardRef(({ className, value, children, ...props }, ref) => {
+  const { currentTab, onTabChange } = useContext(TabsContext);
   const isActive = currentTab === value;
   
   return (
@@ -82,7 +72,8 @@ const TabsTrigger = forwardRef(({ className, value, currentTab, onTabChange, chi
 });
 TabsTrigger.displayName = "TabsTrigger";
 
-const TabsContent = forwardRef(({ className, value, currentTab, children, ...props }, ref) => {
+const TabsContent = forwardRef(({ className, value, children, ...props }, ref) => {
+  const { currentTab } = useContext(TabsContext);
   if (currentTab !== value) return null;
   
   return (
