@@ -1,13 +1,14 @@
 import { useRef, useEffect, useState } from 'react';
+import { cn } from '../lib/utils';
 
-const CodeEditor = ({ value, onChange, language = 'javascript' }) => {
+const CodeEditor = ({ value, onChange, language = 'javascript', className }) => {
   const textareaRef = useRef(null);
   const lineNumbersRef = useRef(null);
   const [lineCount, setLineCount] = useState(1);
 
   useEffect(() => {
     const lines = (value || '').split('\n').length;
-    setLineCount(Math.max(lines, 13)); // At least 13 lines to match screenshot height roughly
+    setLineCount(Math.max(lines, 13)); 
   }, [value]);
 
   const handleScroll = () => {
@@ -30,36 +31,32 @@ const CodeEditor = ({ value, onChange, language = 'javascript' }) => {
   };
 
   return (
-    <div className="rounded-xl overflow-hidden border border-[#1f2937] bg-[#0b0f19]">
-      <div className="flex relative" style={{ minHeight: '320px', maxHeight: '500px' }}>
-        {/* Line Numbers */}
-        <div
-          ref={lineNumbersRef}
-          className="py-4 pl-3 pr-4 select-none overflow-hidden bg-transparent border-r border-[#1f2937]"
-          style={{ minWidth: '40px' }}
-        >
-          {Array.from({ length: lineCount }, (_, i) => (
-            <div
-              key={i}
-              className="text-right text-sm leading-[1.6] font-mono text-gray-500"
-            >
-              {i + 1}
-            </div>
-          ))}
-        </div>
-
-        {/* Textarea */}
-        <textarea
-          ref={textareaRef}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onScroll={handleScroll}
-          onKeyDown={handleKeyDown}
-          spellCheck={false}
-          className="flex-1 bg-transparent text-gray-300 p-4 outline-none resize-none overflow-auto whitespace-pre font-mono text-sm leading-[1.6]"
-          style={{ tabSize: 2, caretColor: '#a855f7' }}
-        />
+    <div className={cn("relative flex w-full font-mono text-sm", className)} style={{ minHeight: '320px', maxHeight: '500px' }}>
+      {/* Line Numbers */}
+      <div
+        ref={lineNumbersRef}
+        className="flex select-none flex-col border-r border-[#333333] bg-[#1E1E1E] py-4 pl-4 pr-3 text-right text-[#858585] overflow-hidden"
+        style={{ minWidth: '48px' }}
+      >
+        {Array.from({ length: lineCount }, (_, i) => (
+          <div key={i} className="leading-relaxed">
+            {i + 1}
+          </div>
+        ))}
       </div>
+
+      {/* Textarea */}
+      <textarea
+        ref={textareaRef}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onScroll={handleScroll}
+        onKeyDown={handleKeyDown}
+        spellCheck={false}
+        className="flex-1 resize-none overflow-auto whitespace-pre bg-[#1E1E1E] p-4 text-[#D4D4D4] outline-none leading-relaxed"
+        style={{ tabSize: 2 }}
+        placeholder={`// Paste your ${language} code here...`}
+      />
     </div>
   );
 };

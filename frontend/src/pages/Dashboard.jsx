@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CodeEditor from '../components/CodeEditor';
-import ReviewSummaryCard from '../components/ReviewSummaryCard';
 import ReviewTabs from '../components/ReviewTabs';
-import { HiOutlineSparkles, HiCode } from 'react-icons/hi';
-import { BiTargetLock } from 'react-icons/bi';
+import StatsCard from '../components/StatsCard';
+import { Sparkles, Code2, Target, FileText, Bug, Lightbulb, Activity, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { reviewAPI } from '../api/axios';
+import { Button } from '../components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
+import { motion } from 'framer-motion';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -17,6 +20,14 @@ const Dashboard = () => {
   const [recentReviews, setRecentReviews] = useState([]);
   const [activeReview, setActiveReview] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  // Dashboard stats state
+  const [stats, setStats] = useState({
+    total: 0,
+    bugsFound: 0,
+    suggestions: 0,
+    avgScore: 0,
+  });
 
   useEffect(() => {
     fetchReviews();
@@ -25,7 +36,29 @@ const Dashboard = () => {
   const fetchReviews = async () => {
     try {
       const res = await reviewAPI.getAll();
-      setRecentReviews(res.data.reviews || []);
+      const reviews = res.data.reviews || [];
+      setRecentReviews(reviews);
+      
+      // Calculate stats
+      let totalBugs = 0;
+      let totalSuggestions = 0;
+      let totalScore = 0;
+      
+      reviews.forEach(r => {
+        if (r.aiResponse) {
+          totalBugs += r.aiResponse.bugs?.length || 0;
+          totalSuggestions += r.aiResponse.suggestions?.length || 0;
+          totalScore += calculateScore(r.aiResponse);
+        }
+      });
+      
+      setStats({
+        total: reviews.length,
+        bugsFound: totalBugs,
+        suggestions: totalSuggestions,
+        avgScore: reviews.length > 0 ? Math.round(totalScore / reviews.length) : 0
+      });
+      
     } catch (err) {
       console.error("Failed to fetch reviews");
     }
@@ -41,27 +74,15 @@ const Dashboard = () => {
       const res = await reviewAPI.create({ language, mode, code });
       toast.success('Analysis complete!', { id: toastId });
       setActiveReview(res.data.review);
-      fetchReviews(); // Refresh history
+      fetchReviews();
+      
+      // Scroll to results
+      document.getElementById('review-results')?.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to review code', { id: toastId });
     } finally {
       setLoading(false);
     }
-  };
-
-  const getLanguageLabel = (lang) => {
-    const labels = { javascript: 'JS', python: 'PY', cpp: 'C++', java: 'JAVA' };
-    return labels[lang] || lang.toUpperCase();
-  };
-
-  const getLanguageColor = (lang) => {
-    const colors = {
-      javascript: 'bg-yellow-500/20 text-yellow-400',
-      python: 'bg-blue-500/20 text-blue-400',
-      cpp: 'bg-purple-500/20 text-purple-400',
-      java: 'bg-orange-500/20 text-orange-400',
-    };
-    return colors[lang] || 'bg-gray-500/20 text-gray-400';
   };
 
   const calculateScore = (aiResponse) => {
@@ -74,131 +95,197 @@ const Dashboard = () => {
     return Math.max(0, 100 - (totalIssues * 5));
   };
 
+  const getScoreColor = (score) => {
+    if (score >= 90) return 'text-success';
+    if (score >= 70) return 'text-warning';
+    return 'text-error';
+  };
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-8">
-      {/* LEFT COLUMN (Span 2) */}
-      <div className="lg:col-span-2 flex flex-col gap-6">
-        
-        {/* NEW CODE REVIEW CARD */}
-        <div className="flat-card p-6 flex flex-col">
-          <h2 className="text-lg font-bold text-white mb-6">New Code Review</h2>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-2">Programming Language</label>
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <HiCode className="text-yellow-400 text-lg" />
-                </div>
-                <select 
-                  value={language} 
-                  onChange={(e) => setLanguage(e.target.value)}
-                  className="select-field bg-[#111827] pl-10 h-[42px]"
-                >
-                  <option value="javascript">JavaScript (Node.js)</option>
-                  <option value="python">Python</option>
-                  <option value="cpp">C++</option>
-                  <option value="java">Java</option>
-               </select>
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-2">Review Mode</label>
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <BiTargetLock className="text-purple-500 text-lg" />
-                </div>
-                <select 
-                  value={mode} 
-                  onChange={(e) => setMode(e.target.value)}
-                  className="select-field bg-[#111827] pl-10 h-[42px]"
-                >
-                  <option value="interview">Advanced Mode</option>
-                  <option value="beginner">Beginner Mode</option>
-               </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-2">
-            <label className="block text-xs font-medium text-gray-400 mb-2">Paste Your Code</label>
-            <CodeEditor value={code} onChange={setCode} language={language} />
-          </div>
-
-          <div className="flex items-center justify-between text-[11px] text-gray-500 mb-4 px-1">
-            <span>Supports: C++, Java, Python, JavaScript</span>
-            <span>{code.split('\n').length} lines</span>
-          </div>
-
-          <div className="flex justify-end">
-            <button onClick={handleReview} disabled={loading} className="btn-primary gap-2">
-              {loading ? <div className="loader !w-4 !h-4 !border-2"></div> : <HiOutlineSparkles className="text-lg" />}
-              {loading ? 'Analyzing...' : 'Review Code \u2192'}
-            </button>
-          </div>
-        </div>
-
-        {/* AI REVIEW RESULTS CARD */}
-        <div className="flex-1">
-          <ReviewTabs review={activeReview} />
-        </div>
+    <div className="space-y-8 animate-fade-in pb-8">
+      
+      {/* Quick Stats Row */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <StatsCard 
+          icon={FileText} 
+          label="Total Reviews" 
+          value={stats.total} 
+          trend={12} 
+          trendLabel="vs last month" 
+          delay={100} 
+        />
+        <StatsCard 
+          icon={Bug} 
+          label="Bugs Found" 
+          value={stats.bugsFound} 
+          trend={-5} 
+          trendLabel="vs last month" 
+          delay={200} 
+        />
+        <StatsCard 
+          icon={Lightbulb} 
+          label="Suggestions" 
+          value={stats.suggestions} 
+          trend={8} 
+          trendLabel="vs last month" 
+          delay={300} 
+        />
+        <StatsCard 
+          icon={Activity} 
+          label="Average Score" 
+          value={`${stats.avgScore}/100`} 
+          trend={stats.avgScore > 0 ? 2 : 0} 
+          trendLabel="vs last month" 
+          delay={400} 
+        />
       </div>
 
-      {/* RIGHT COLUMN (Span 1) */}
-      <div className="lg:col-span-1 flex flex-col gap-6">
-        
-        {/* REVIEW SUMMARY CARD */}
-        <div>
-          <ReviewSummaryCard review={activeReview} />
-        </div>
-
-        {/* RECENT REVIEWS CARD */}
-        <div className="flat-card p-6 flex-1 flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-white">Recent Reviews</h2>
-            <button 
-              onClick={() => navigate('/my-reviews')}
-              className="text-xs text-gray-400 hover:text-white transition-colors"
-            >
-              View All
-            </button>
-          </div>
-
-          <div className="space-y-0">
-            {recentReviews.length === 0 ? (
-              <div className="py-8 text-center text-gray-500 text-sm">
-                No reviews yet. Submit some code!
-              </div>
-            ) : (
-              recentReviews.slice(0, 5).map((rev) => (
-                <div
-                  key={rev._id}
-                  onClick={() => setActiveReview(rev.aiResponse)}
-                  className="flex items-center justify-between py-3 border-b border-[#1f2937] cursor-pointer hover:bg-[#1f2937]/30 transition-colors px-3 -mx-2 rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-[10px] ${getLanguageColor(rev.language)}`}>
-                      {getLanguageLabel(rev.language)}
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white capitalize">{rev.language} Review</h4>
-                      <p className="text-[10px] text-gray-500 capitalize">{rev.mode === 'interview' ? 'Advanced' : rev.mode} Mode</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className={`text-sm font-bold block ${calculateScore(rev.aiResponse) >= 80 ? 'text-green-500' : calculateScore(rev.aiResponse) >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
-                      {calculateScore(rev.aiResponse)}
-                    </span>
-                    <span className="text-[10px] text-gray-500">
-                      {new Date(rev.createdAt).toLocaleDateString()}
-                    </span>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        {/* Main Workspace (Span 2) */}
+        <div className="lg:col-span-2 space-y-8">
+          
+          <Card animate>
+            <CardHeader>
+              <CardTitle>Review Workspace</CardTitle>
+              <CardDescription>Paste your code below to get instant AI feedback</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-text-primary">Language</label>
+                  <div className="relative">
+                    <Code2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
+                    <select
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      className="flex h-10 w-full appearance-none rounded-md border border-border bg-background pl-10 pr-4 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
+                    >
+                      <option value="javascript">JavaScript</option>
+                      <option value="python">Python</option>
+                      <option value="cpp">C++</option>
+                      <option value="java">Java</option>
+                    </select>
                   </div>
                 </div>
-              ))
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-text-primary">Review Mode</label>
+                  <div className="relative">
+                    <Target className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
+                    <select
+                      value={mode}
+                      onChange={(e) => setMode(e.target.value)}
+                      className="flex h-10 w-full appearance-none rounded-md border border-border bg-background pl-10 pr-4 py-2 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
+                    >
+                      <option value="interview">Advanced / Strict</option>
+                      <option value="beginner">Beginner / Educational</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-text-primary">Source Code</label>
+                  <span className="text-xs text-text-secondary">{code.split('\n').length} lines</span>
+                </div>
+                <div className="rounded-md border border-border bg-[#1E1E1E] overflow-hidden">
+                  <CodeEditor value={code} onChange={setCode} language={language} />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button 
+                  onClick={handleReview} 
+                  isLoading={loading} 
+                  size="lg" 
+                  className="gap-2 w-full sm:w-auto"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  {loading ? 'Analyzing Code...' : 'Analyze Code'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Review Results */}
+          <div id="review-results">
+            {activeReview && (
+              <Card animate className="border-primary/20 shadow-lg shadow-primary/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Analysis Results
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ReviewTabs review={activeReview} />
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>
 
+        {/* Sidebar (Span 1) */}
+        <div className="space-y-8 lg:col-span-1">
+          <Card animate>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div className="space-y-1">
+                <CardTitle>Recent Reviews</CardTitle>
+                <CardDescription>Your latest code analyses</CardDescription>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => navigate('/my-reviews')} title="View All">
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 pt-4">
+                {recentReviews.length === 0 ? (
+                  <div className="text-center text-sm text-text-secondary py-8">
+                    No reviews yet. Submit your first code snippet!
+                  </div>
+                ) : (
+                  recentReviews.slice(0, 5).map((rev) => {
+                    const score = calculateScore(rev.aiResponse);
+                    return (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        key={rev._id}
+                        onClick={() => {
+                          setActiveReview(rev.aiResponse);
+                          document.getElementById('review-results')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="group flex items-center justify-between rounded-lg border border-border bg-surface p-3 transition-colors hover:bg-surface/80 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-background border border-border text-xs font-bold uppercase text-primary group-hover:border-primary/30 transition-colors">
+                            {rev.language.slice(0, 2)}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold capitalize text-text-primary">
+                              {rev.language} Review
+                            </span>
+                            <span className="text-xs text-text-secondary capitalize">
+                              {rev.mode === 'interview' ? 'Advanced' : rev.mode}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className={`text-sm font-bold ${getScoreColor(score)}`}>
+                            {score}
+                          </span>
+                          <span className="text-[10px] text-text-secondary">
+                            {new Date(rev.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </motion.div>
+                    );
+                  })
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
