@@ -16,7 +16,7 @@ const ReviewTabs = ({ review }) => {
     );
   }
 
-  const IssueList = ({ items, icon: Icon, colorClass }) => {
+  const IssueList = ({ items, icon: Icon, colorClass, itemLabel }) => {
     if (!items || items.length === 0) {
       return (
         <div className="py-8 text-center text-sm text-text-secondary">
@@ -28,7 +28,7 @@ const ReviewTabs = ({ review }) => {
     return (
       <div className="space-y-4">
         {items.map((item, i) => {
-          const title = typeof item === 'string' ? "Issue Detected" : (item.title || "Observation");
+          const title = typeof item === 'string' ? `${itemLabel} ${i + 1}` : (item.title || `${itemLabel} ${i + 1}`);
           const desc = typeof item === 'string' ? item : item.desc;
           const severity = typeof item === 'string' ? "Medium" : (item.severity || "Medium");
 
@@ -91,16 +91,16 @@ const ReviewTabs = ({ review }) => {
 
       <div className="mt-6">
         <TabsContent value="bugs">
-          <IssueList items={review.bugs} icon={AlertCircle} colorClass="text-error" />
+          <IssueList items={review.bugs} icon={AlertCircle} colorClass="text-error" itemLabel="Bug" />
         </TabsContent>
         <TabsContent value="suggestions">
-          <IssueList items={review.suggestions} icon={Lightbulb} colorClass="text-warning" />
+          <IssueList items={review.suggestions} icon={Lightbulb} colorClass="text-warning" itemLabel="Suggestion" />
         </TabsContent>
         <TabsContent value="readability">
-          <IssueList items={review.readability} icon={Type} colorClass="text-primary" />
+          <IssueList items={review.readability} icon={Type} colorClass="text-primary" itemLabel="Readability Note" />
         </TabsContent>
         <TabsContent value="optimization">
-          <IssueList items={review.optimization} icon={Zap} colorClass="text-success" />
+          <IssueList items={review.optimization} icon={Zap} colorClass="text-success" itemLabel="Optimization Idea" />
         </TabsContent>
         <TabsContent value="complexity">
           <div className="grid gap-4 sm:grid-cols-2">

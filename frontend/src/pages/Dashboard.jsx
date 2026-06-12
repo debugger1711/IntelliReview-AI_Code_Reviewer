@@ -96,8 +96,8 @@ const Dashboard = () => {
   };
 
   const getScoreColor = (score) => {
-    if (score >= 90) return 'text-success';
-    if (score >= 70) return 'text-warning';
+    if (score >= 60) return 'text-success';
+    if (score >= 40) return 'text-warning';
     return 'text-error';
   };
 
