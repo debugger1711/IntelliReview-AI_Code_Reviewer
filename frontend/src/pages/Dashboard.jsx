@@ -207,6 +207,30 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
+          {/* Review Results */}
+          <div id="review-results">
+            <Card animate className="border-primary/20 shadow-lg shadow-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Analysis Results
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {activeReview ? (
+                  <ReviewTabs review={activeReview} />
+                ) : (
+                  <div className="text-center text-sm text-text-secondary py-8">
+                    Submit your code to see the AI review analysis here.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Sidebar (Span 1) */}
+        <div className="space-y-8 lg:col-span-1">
           {/* Recent Reviews */}
           <Card animate>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -266,26 +290,6 @@ const Dashboard = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Sidebar (Span 1) */}
-        <div className="space-y-8 lg:col-span-1">
-          {/* Review Results */}
-          <div id="review-results">
-            {activeReview && (
-              <Card animate className="border-primary/20 shadow-lg shadow-primary/5">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    Analysis Results
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ReviewTabs review={activeReview} />
-                </CardContent>
-              </Card>
-            )}
-          </div>
         </div>
       </div>
     </div>
