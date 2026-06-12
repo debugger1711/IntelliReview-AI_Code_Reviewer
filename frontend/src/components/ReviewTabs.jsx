@@ -68,22 +68,22 @@ const ReviewTabs = ({ review }) => {
   return (
     <Tabs defaultValue="bugs" className="w-full">
       <div className="overflow-x-auto pb-2 custom-scrollbar">
-        <TabsList>
-          <TabsTrigger value="bugs" className="gap-2">
+        <TabsList className="w-full flex min-w-max">
+          <TabsTrigger value="bugs" className="flex-1 gap-2">
             <AlertCircle className="h-4 w-4 text-error" /> Bugs
             {review.bugs?.length > 0 && <span className="ml-1 rounded-full bg-error/10 px-1.5 py-0.5 text-[10px] font-bold text-error">{review.bugs.length}</span>}
           </TabsTrigger>
-          <TabsTrigger value="suggestions" className="gap-2">
+          <TabsTrigger value="suggestions" className="flex-1 gap-2">
             <Lightbulb className="h-4 w-4 text-warning" /> Suggestions
             {review.suggestions?.length > 0 && <span className="ml-1 rounded-full bg-warning/10 px-1.5 py-0.5 text-[10px] font-bold text-warning">{review.suggestions.length}</span>}
           </TabsTrigger>
-          <TabsTrigger value="readability" className="gap-2">
+          <TabsTrigger value="readability" className="flex-1 gap-2">
             <Type className="h-4 w-4 text-primary" /> Readability
           </TabsTrigger>
-          <TabsTrigger value="optimization" className="gap-2">
+          <TabsTrigger value="optimization" className="flex-1 gap-2">
             <Zap className="h-4 w-4 text-success" /> Optimization
           </TabsTrigger>
-          <TabsTrigger value="complexity" className="gap-2">
+          <TabsTrigger value="complexity" className="flex-1 gap-2">
             <Activity className="h-4 w-4 text-text-secondary" /> Complexity
           </TabsTrigger>
         </TabsList>

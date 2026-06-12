@@ -238,7 +238,7 @@ const Dashboard = () => {
                 <span className="text-sm font-medium text-text-secondary uppercase tracking-wider">Code Quality</span>
                 <div className="flex items-baseline gap-1">
                   <span className={`text-6xl font-extrabold tracking-tighter ${activeReview ? getScoreColor(calculateScore(activeReview)) : 'text-text-muted'}`}>
-                    {activeReview ? calculateScore(activeReview) : '--'}
+                    {activeReview ? calculateScore(activeReview) : '0'}
                   </span>
                   <span className="text-2xl text-text-secondary font-medium">/100</span>
                 </div>
@@ -248,13 +248,13 @@ const Dashboard = () => {
                 <div className="flex flex-col items-center justify-center p-3 bg-background/60 rounded-xl border border-border/50 transition-colors hover:border-error/30 hover:bg-error/5">
                   <span className="text-xs text-text-secondary mb-1 font-medium">Bugs Found</span>
                   <span className="text-2xl font-bold text-error">
-                    {activeReview ? activeReview.bugs?.length || 0 : '-'}
+                    {activeReview ? activeReview.bugs?.length || 0 : '0'}
                   </span>
                 </div>
                 <div className="flex flex-col items-center justify-center p-3 bg-background/60 rounded-xl border border-border/50 transition-colors hover:border-warning/30 hover:bg-warning/5">
                   <span className="text-xs text-text-secondary mb-1 font-medium">Suggestions</span>
                   <span className="text-2xl font-bold text-warning">
-                    {activeReview ? activeReview.suggestions?.length || 0 : '-'}
+                    {activeReview ? activeReview.suggestions?.length || 0 : '0'}
                   </span>
                 </div>
               </div>
@@ -263,13 +263,13 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between p-3.5 bg-background/60 rounded-xl border border-border/50 transition-colors hover:border-primary/30">
                   <span className="text-sm font-medium text-text-secondary">Time Complexity</span>
                   <Badge variant="outline" className="font-mono text-sm border-primary/20 text-primary bg-primary/5">
-                    {activeReview?.timeComplexity || 'O(-)'}
+                    {activeReview?.timeComplexity?.match(/O\([^)]+\)/)?.[0] || 'O(-)'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between p-3.5 bg-background/60 rounded-xl border border-border/50 transition-colors hover:border-primary/30">
                   <span className="text-sm font-medium text-text-secondary">Space Complexity</span>
                   <Badge variant="outline" className="font-mono text-sm border-primary/20 text-primary bg-primary/5">
-                    {activeReview?.spaceComplexity || 'O(-)'}
+                    {activeReview?.spaceComplexity?.match(/O\([^)]+\)/)?.[0] || 'O(-)'}
                   </Badge>
                 </div>
               </div>
