@@ -231,6 +231,51 @@ const Dashboard = () => {
 
         {/* Sidebar (Span 1) */}
         <div className="space-y-8 lg:col-span-1">
+          {/* Current Review Summary */}
+          <Card animate className="border-primary/20 bg-gradient-to-b from-surface to-surface/50 shadow-lg shadow-primary/5">
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center justify-center space-y-2 mb-6">
+                <span className="text-sm font-medium text-text-secondary uppercase tracking-wider">Code Quality</span>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-6xl font-extrabold tracking-tighter ${activeReview ? getScoreColor(calculateScore(activeReview)) : 'text-text-muted'}`}>
+                    {activeReview ? calculateScore(activeReview) : '--'}
+                  </span>
+                  <span className="text-2xl text-text-secondary font-medium">/100</span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="flex flex-col items-center justify-center p-3 bg-background/60 rounded-xl border border-border/50 transition-colors hover:border-error/30 hover:bg-error/5">
+                  <span className="text-xs text-text-secondary mb-1 font-medium">Bugs Found</span>
+                  <span className="text-2xl font-bold text-error">
+                    {activeReview ? activeReview.bugs?.length || 0 : '-'}
+                  </span>
+                </div>
+                <div className="flex flex-col items-center justify-center p-3 bg-background/60 rounded-xl border border-border/50 transition-colors hover:border-warning/30 hover:bg-warning/5">
+                  <span className="text-xs text-text-secondary mb-1 font-medium">Suggestions</span>
+                  <span className="text-2xl font-bold text-warning">
+                    {activeReview ? activeReview.suggestions?.length || 0 : '-'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3.5 bg-background/60 rounded-xl border border-border/50 transition-colors hover:border-primary/30">
+                  <span className="text-sm font-medium text-text-secondary">Time Complexity</span>
+                  <Badge variant="outline" className="font-mono text-sm border-primary/20 text-primary bg-primary/5">
+                    {activeReview?.timeComplexity || 'O(-)'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between p-3.5 bg-background/60 rounded-xl border border-border/50 transition-colors hover:border-primary/30">
+                  <span className="text-sm font-medium text-text-secondary">Space Complexity</span>
+                  <Badge variant="outline" className="font-mono text-sm border-primary/20 text-primary bg-primary/5">
+                    {activeReview?.spaceComplexity || 'O(-)'}
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Recent Reviews */}
           <Card animate>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
