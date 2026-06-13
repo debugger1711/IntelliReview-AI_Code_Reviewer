@@ -21,7 +21,7 @@ const navItems = [
   { path: '/profile', label: 'Profile', icon: User },
 ];
 
-const Sidebar = ({ isCollapsed, toggleCollapse }) => {
+const Sidebar = ({ isCollapsed, toggleCollapse, isMobileOpen, closeMobile }) => {
   const { logout } = useAuth();
 
   const linkClass = ({ isActive }) =>
@@ -75,6 +75,9 @@ const Sidebar = ({ isCollapsed, toggleCollapse }) => {
             end={item.path === '/'}
             className={linkClass}
             title={isCollapsed ? item.label : undefined}
+            onClick={() => {
+              if (closeMobile) closeMobile();
+            }}
           >
             {({ isActive }) => (
               <>
@@ -159,6 +162,30 @@ const Sidebar = ({ isCollapsed, toggleCollapse }) => {
 
   return (
     <>
+      {/* Mobile Sidebar */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeMobile}
+              className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
+            />
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col bg-background lg:hidden shadow-xl"
+            >
+              <SidebarContent />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* Desktop Sidebar */}
       <aside 
         className={cn(

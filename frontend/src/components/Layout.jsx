@@ -9,6 +9,7 @@ const Layout = () => {
   const { user } = useAuth();
   const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const getPageInfo = () => {
     switch (location.pathname) {
@@ -28,16 +29,21 @@ const Layout = () => {
   const { title, subtitle } = getPageInfo();
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar isCollapsed={isSidebarCollapsed} toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
+    <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
+      <Sidebar 
+        isCollapsed={isSidebarCollapsed} 
+        toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        isMobileOpen={isMobileMenuOpen}
+        closeMobile={() => setIsMobileMenuOpen(false)}
+      />
       <div 
         className={cn(
-          "flex flex-1 flex-col transition-all duration-300",
+          "flex w-full flex-1 flex-col transition-all duration-300",
           isSidebarCollapsed ? "lg:pl-[80px]" : "lg:pl-[260px]"
         )}
       >
-        <TopNav title={title} subtitle={subtitle} />
-        <main className="flex-1 p-8 overflow-y-auto">
+        <TopNav title={title} subtitle={subtitle} toggleMobileMenu={() => setIsMobileMenuOpen(true)} />
+        <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
           <div className="mx-auto max-w-7xl">
             <Outlet />
           </div>
