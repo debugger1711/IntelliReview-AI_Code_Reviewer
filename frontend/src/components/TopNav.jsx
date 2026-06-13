@@ -2,10 +2,10 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Avatar } from './ui/Avatar';
-import { Search, Sun, Moon, LogOut } from 'lucide-react';
+import { Search, Sun, Moon, LogOut, Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const TopNav = ({ title, subtitle }) => {
+const TopNav = ({ title, subtitle, toggleMobileMenu }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -24,6 +24,15 @@ const TopNav = ({ title, subtitle }) => {
       </div>
 
       <div className="flex items-center gap-4">
+        {/* Mobile Menu Toggle */}
+        <button
+          onClick={toggleMobileMenu}
+          className="lg:hidden flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface text-text-secondary hover:text-text-primary transition-colors"
+          aria-label="Open menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+
         {/* Search Placeholder */}
         <div className="relative hidden md:block">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
