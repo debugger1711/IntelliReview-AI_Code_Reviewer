@@ -31,7 +31,7 @@ const CodeEditor = ({ value, onChange, language = 'javascript', className }) => 
   };
 
   return (
-    <div className={cn("relative flex w-full font-mono text-sm", className)} style={{ minHeight: '320px', maxHeight: '500px' }}>
+    <div className={cn("relative flex w-full font-mono text-sm min-w-0", className)} style={{ minHeight: '320px', maxHeight: '500px' }}>
       {/* Line Numbers */}
       <div
         ref={lineNumbersRef}
@@ -53,7 +53,7 @@ const CodeEditor = ({ value, onChange, language = 'javascript', className }) => 
         onScroll={handleScroll}
         onKeyDown={handleKeyDown}
         spellCheck={false}
-        className="flex-1 resize-none overflow-auto whitespace-pre bg-[#1E1E1E] p-4 text-[#D4D4D4] outline-none leading-relaxed"
+        className="flex-1 min-w-0 w-full resize-none overflow-auto whitespace-pre bg-[#1E1E1E] p-4 text-[#D4D4D4] outline-none leading-relaxed"
         style={{ tabSize: 2 }}
         placeholder={`// Paste your ${language} code here...`}
       />
