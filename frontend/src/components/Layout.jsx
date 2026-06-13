@@ -38,13 +38,13 @@ const Layout = () => {
       />
       <div 
         className={cn(
-          "flex w-full flex-1 flex-col transition-all duration-300",
+          "flex w-full flex-1 flex-col transition-all duration-300 min-w-0",
           isSidebarCollapsed ? "lg:pl-[80px]" : "lg:pl-[260px]"
         )}
       >
         <TopNav title={title} subtitle={subtitle} toggleMobileMenu={() => setIsMobileMenuOpen(true)} />
-        <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
-          <div className="mx-auto max-w-7xl">
+        <main className="flex-1 p-4 lg:p-8 overflow-y-auto min-w-0">
+          <div className="mx-auto max-w-7xl w-full min-w-0">
             <Outlet />
           </div>
         </main>
