@@ -17,13 +17,13 @@ const TopNav = ({ title, subtitle, toggleMobileMenu }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-8 transition-colors">
-      <div className="flex flex-col">
-        {title && <h1 className="text-xl font-bold tracking-tight text-text-primary">{title}</h1>}
-        {subtitle && <p className="text-sm text-text-secondary">{subtitle}</p>}
+    <header className="sticky top-0 z-30 flex h-[72px] w-full items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-4 sm:px-6 lg:px-8 transition-colors">
+      <div className="flex flex-col min-w-0 mr-4">
+        {title && <h1 className="text-lg sm:text-xl font-bold tracking-tight text-text-primary truncate">{title}</h1>}
+        {subtitle && <p className="text-xs sm:text-sm text-text-secondary truncate hidden sm:block">{subtitle}</p>}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
         {/* Mobile Menu Toggle */}
         <button
           onClick={toggleMobileMenu}
@@ -34,7 +34,7 @@ const TopNav = ({ title, subtitle, toggleMobileMenu }) => {
         </button>
 
         {/* Search Placeholder */}
-        <div className="relative hidden md:block">
+        <div className="relative hidden lg:block">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
           <input
             type="text"
@@ -53,12 +53,12 @@ const TopNav = ({ title, subtitle, toggleMobileMenu }) => {
         </button>
 
         {/* User Dropdown Placeholder */}
-        <div className="flex items-center gap-3 rounded-full border border-border bg-surface py-1 pl-1 pr-3 transition-colors hover:bg-surface/80 cursor-pointer">
+        <div className="flex items-center gap-2 sm:gap-3 rounded-full border border-border bg-surface py-1 pl-1 pr-2 sm:pr-3 transition-colors hover:bg-surface/80 cursor-pointer">
           <Avatar
             fallback={getInitials(user?.name)}
             className="h-7 w-7 bg-primary text-primary-foreground border-none"
           />
-          <span className="text-sm font-medium text-text-primary">
+          <span className="text-sm font-medium text-text-primary hidden sm:block">
             {user?.name?.split(' ')[0] || 'User'}
           </span>
           <button onClick={logout} className="ml-1 text-text-secondary hover:text-error transition-colors" title="Logout">

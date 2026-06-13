@@ -105,7 +105,7 @@ const Dashboard = () => {
     <div className="space-y-8 animate-fade-in pb-8">
       
       {/* Quick Stats Row */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard 
           icon={FileText} 
           label="Total Reviews" 
@@ -149,8 +149,8 @@ const Dashboard = () => {
               <CardTitle>Review Workspace</CardTitle>
               <CardDescription>Paste your code below to get instant AI feedback</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <CardContent className="space-y-4 md:space-y-6">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-text-primary">Language</label>
                   <div className="relative">
@@ -198,7 +198,7 @@ const Dashboard = () => {
                   onClick={handleReview} 
                   isLoading={loading} 
                   size="lg" 
-                  className="gap-2 w-full sm:w-auto"
+                  className="gap-2 w-full md:w-auto"
                 >
                   <Sparkles className="h-4 w-4" />
                   {loading ? 'Analyzing Code...' : 'Analyze Code'}
